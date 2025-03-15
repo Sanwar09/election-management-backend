@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Election Results</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="transition-colors duration-500 ease-in-out bg-white dark:bg-gray-900 flex justify-center items-center min-h-screen">
+  <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-2xl">
+    <h1 class="text-3xl font-bold text-center text-blue-600 mb-6">Election Results</h1>
+
+    <!-- The container where results will be displayed -->
+    <div id="results-list" class="space-y-4 opacity-0 transition-opacity duration-1000">
+      <!-- Results will be dynamically listed here -->
+    </div>
+  </div>
+
+  <script>
+    async function fetchResults() {
+      try {
+        const response = await fetch('http://localhost:5000/results');
+        const results = await response.json();
+
+        const resultsList = document.getElementById('results-list');
+        resultsList.innerHTML = ''; // Clear existing results
+
+        // Loop through the results and create result elements
+        results.forEach(result => {
+          const resultDiv = document.createElement('div');
+          resultDiv.classList.add('flex', 'items-center', 'mb-4');
+
+          const resultText = document.createElement('p');
+          resultText.classList.add('text-lg');
+          resultText.textContent = `${result.name} (${result.party}) - Votes: ${result.vote_count}`;
+
+          resultDiv.appendChild(resultText);
+          resultsList.appendChild(resultDiv);
+        });
+
+        // Add fade-in animation after results are added
+        resultsList.classList.remove('opacity-0');  // Make the results visible
+        resultsList.classList.add('opacity-100');   // Trigger the fade-in effect
+
+      } catch (error) {
+        console.error('Error fetching results:', error);
+        const resultsList = document.getElementById('results-list');
+        resultsList.innerHTML = '<p class="text-center text-lg text-red-500">Error fetching results. Please try again later.</p>';
+      }
+    }
+
+    fetchResults();
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!-- logout.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logout</title>
+  <script>
+    // Function to handle the logout request
+    async function logout() {
+      try {
+        const response = await fetch('/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'same-origin', // Include cookies (session cookies)
+        });
+
+        // Log response for debugging
+        console.log('Logout response:', response);
+
+        const data = await response.json();
+        if (response.ok) {
+          alert(data.message);  // Show success message
+          window.location.href = '/login';  // Redirect to login page after logout
+        } else {
+          alert('Error: ' + data.message);  // Show error message if something goes wrong
+        }
+      } catch (error) {
+        // Log the error for debugging
+        console.error('Error during logout:', error);
+        alert('An error occurred during logout');
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>You are logged in</h1>
+  <p>Click the button below to log out.</p>
+  <button onclick="logout()">Logout</button>
+</body>
+</html>

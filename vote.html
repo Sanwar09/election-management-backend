@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vote</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+    <h1 class="text-3xl font-bold text-center text-blue-600 mb-6">Vote for Your Candidate</h1>
+
+    <div id="candidate-list" class="space-y-4">
+      <!-- Each candidate will be dynamically listed here -->
+    </div>
+
+    <button id="vote-btn" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 mt-6" disabled>Submit Vote</button>
+  </div>
+
+  <script>
+    let selectedCandidate = null;
+
+    async function fetchCandidates() {
+      const response = await fetch('http://localhost:5000/candidates');
+      const candidates = await response.json();
+      
+      const candidateList = document.getElementById('candidate-list');
+      candidateList.innerHTML = ''; // Clear existing candidates
+
+      candidates.forEach(candidate => {
+        const candidateDiv = document.createElement('div');
+        candidateDiv.classList.add('flex', 'items-center', 'mb-4', 'p-4', 'bg-gray-50', 'rounded-lg', 'hover:bg-blue-100', 'cursor-pointer');
+        
+        const radioBtn = document.createElement('input');
+        radioBtn.type = 'radio';
+        radioBtn.name = 'candidate';
+        radioBtn.value = candidate.id;
+        radioBtn.classList.add('mr-3', 'text-blue-600', 'focus:ring-2', 'focus:ring-blue-500');
+        radioBtn.addEventListener('change', () => {
+          selectedCandidate = candidate.id;
+          document.getElementById('vote-btn').disabled = false;
+        });
+
+        const candidateLabel = document.createElement('label');
+        candidateLabel.classList.add('text-lg', 'font-medium', 'text-gray-700');
+        candidateLabel.textContent = `${candidate.name} - ${candidate.party}`;
+
+        candidateDiv.appendChild(radioBtn);
+        candidateDiv.appendChild(candidateLabel);
+        candidateList.appendChild(candidateDiv);
+      });
+    }
+
+    document.getElementById('vote-btn').addEventListener('click', async () => {
+      const user_id = 1; // Placeholder, replace with actual logged-in user ID
+      
+      const response = await fetch('http://localhost:5000/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id, candidate_id: selectedCandidate }),
+      });
+
+      const data = await response.json();
+      alert(data.message || data.error);
+    });
+
+    fetchCandidates();
+  </script>
+</body>
+</html>
